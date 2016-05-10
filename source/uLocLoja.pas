@@ -1,0 +1,222 @@
+unit uLocLoja;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, Grids, DBGrids, Buttons, StdCtrls, ExtCtrls, DB, DBTables;
+
+type
+  TfrmLocLojas = class(TForm)
+    Edit1: TLabeledEdit;
+    BtnConfirmar: TSpeedButton;
+    BtnCancelar: TSpeedButton;
+    GridDados: TDBGrid;
+    dsLojas: TDataSource;
+    rdCODIGO: TRadioButton;
+    rbNOME: TRadioButton;
+    edtNome: TLabeledEdit;
+    qryLoja: TQuery;
+    qryLojaLOJ_CDLOJA: TStringField;
+    qryLojaLOJ_NMLOJA: TStringField;
+    procedure Edit1Change(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure BtnConfirmarClick(Sender: TObject);
+    procedure BtnCancelarClick(Sender: TObject);
+    procedure Edit1KeyPress(Sender: TObject; var Key: Char);
+    procedure rdCODIGOClick(Sender: TObject);
+    procedure rbNOMEClick(Sender: TObject);
+    procedure GridDadosKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure edtNomeChange(Sender: TObject);
+    procedure edtNomeKeyPress(Sender: TObject; var Key: Char);
+    procedure GridDadosKeyPress(Sender: TObject; var Key: Char);
+    procedure GridDadosDblClick(Sender: TObject);
+    procedure edtNomeKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure Edit1KeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmLocLojas: TfrmLocLojas;
+  M_NMFORM : Integer;
+implementation
+
+uses udmEtiquetas,uFuncoes, uConfRelatorio, uConsulta, uConfRelVendas;
+
+{$R *.dfm}
+
+procedure TfrmLocLojas.Edit1Change(Sender: TObject);
+begin
+   If not uFuncoes.Empty(Edit1.Text) Then
+   begin
+     If (rdCODIGO.Checked = True) Then
+     begin
+         With qryLoja do
+         begin
+              SQL.Clear;
+              Sql.add('Select LOJ_CDLOJA, LOJ_NMLOJA from "SACLOJ.DBF" where LOJ_CDLOJA like '
+                 + quotedstr(uFuncoes.StrZero(edit1.Text,3)+'%') + ' order by LOJ_NMLOJA');
+              ExecSQL;
+              Open;
+          End;
+     End;
+    End
+    Else
+    begin
+         With qryLoja do
+         begin
+              sql.clear;
+              sql.add('Select LOJ_CDLOJA, LOJ_NMLOJA from "SACLOJ.DBF" order by LOJ_NMLOJA');
+              execsql;
+              open;
+         End;
+    End;
+end;
+
+procedure TfrmLocLojas.FormShow(Sender: TObject);
+begin
+   With qryLoja do
+   begin
+         sql.clear;
+         sql.add('Select LOJ_CDLOJA, LOJ_NMLOJA from "SACLOJ.DBF" order by LOJ_NMLOJA');
+         execsql;
+         open;
+   End;
+   //
+     Edit1.Visible := False;
+     //
+     edtNome.Left := Edit1.Left;
+     edtNome.Top  := Edit1.Top;
+     //
+     edtNome.Visible := True;
+     edtNome.SetFocus;
+end;
+
+procedure TfrmLocLojas.BtnConfirmarClick(Sender: TObject);
+Var
+    M_CDLOJA : String;
+begin
+     M_CDLOJA := qryLoja.fieldByName('LOJ_CDLOJA').AsString;
+     //
+     If (M_NMFORM = 1) Then
+         frmConfRelatorio.edtLoja.Text := M_CDLOJA;
+     //
+     If (M_NMFORM = 2) Then
+         frmConsulta.edtLoja.Text := M_CDLOJA;
+     If (M_NMFORM = 3) Then
+     begin
+         frmConfRelVendas.edtLoja.Text := M_CDLOJA;
+         frmConfRelVendas.lbl_NMLOJA.Caption := qryLoja.fieldByName('LOJ_NMLOJA').AsString;
+     End;
+     // Fechar janela de localizar
+     close;
+end;
+
+procedure TfrmLocLojas.BtnCancelarClick(Sender: TObject);
+begin
+      Close;
+end;
+
+procedure TfrmLocLojas.Edit1KeyPress(Sender: TObject; var Key: Char);
+begin
+    If not( key in['0'..'9',#13,#8] ) then
+       key:=#0;
+    //
+    if key = #13 then btnconfirmar.Click;
+    if key = #13 then btncancelar.Click;
+end;
+
+procedure TfrmLocLojas.rdCODIGOClick(Sender: TObject);
+begin
+     edtNome.Visible := False;
+     Edit1.Visible := True;
+     //
+     Edit1.SetFocus;
+end;
+
+procedure TfrmLocLojas.rbNOMEClick(Sender: TObject);
+begin
+     Edit1.Visible := False;
+     //
+     edtNome.Left := Edit1.Left;
+     edtNome.Top  := Edit1.Top;
+     //
+     edtNome.Visible := True;
+     edtNome.SetFocus;
+end;
+
+procedure TfrmLocLojas.GridDadosKeyDown(Sender: TObject;
+  var Key: Word; Shift: TShiftState);
+begin
+     if (Shift = [ssCtrl]) and (Key = 46) Then
+          KEY := 0;
+end;
+
+procedure TfrmLocLojas.edtNomeChange(Sender: TObject);
+begin
+   If not uFuncoes.Empty(edtNome.Text) Then
+   begin
+        With qryLoja do
+        begin
+             SQL.Clear;
+             Close;
+             Sql.add('Select LOJ_CDLOJA, LOJ_NMLOJA from "SACLOJ.DBF" where LOJ_NMLOJA like '
+              + quotedstr(edtNome.Text+'%') + ' order by LOJ_NMLOJA');
+             ExecSQL;
+             Open;
+        End;
+    End
+    Else
+    begin
+         With qryLoja do
+         begin
+              sql.clear;
+              Close;
+              sql.add('Select LOJ_CDLOJA, LOJ_NMLOJA from "SACLOJ.DBF" order by LOJ_NMLOJA');
+              execsql;
+              open;
+         End;
+    End;
+end;
+
+procedure TfrmLocLojas.edtNomeKeyPress(Sender: TObject; var Key: Char);
+begin
+    if key = #13 then btnconfirmar.Click;
+    if key = #13 then btncancelar.Click;
+end;
+
+procedure TfrmLocLojas.GridDadosKeyPress(Sender: TObject; var Key: Char);
+begin
+     btnconfirmar.Click;
+end;
+
+procedure TfrmLocLojas.GridDadosDblClick(Sender: TObject);
+begin
+     btnconfirmar.Click;
+end;
+
+procedure TfrmLocLojas.edtNomeKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+     If (Key = VK_UP) Then
+        qryLoja.Prior;
+     If (Key = VK_DOWN) Then
+        qryLoja.Next;
+end;
+
+procedure TfrmLocLojas.Edit1KeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+     If (Key = VK_UP) Then
+        qryLoja.Prior;
+     If (Key = VK_DOWN) Then
+        qryLoja.Next;
+end;
+
+end.

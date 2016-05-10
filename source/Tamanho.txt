@@ -1,0 +1,11 @@
+Width = 181
+Heigth = 76
+0000000000000
+123456789012
+
+        Try
+          Application.CreateForm(TfrmExcluidos3, frmExcluidos3);
+           frmExcluidos3.QuickRep1.Preview ;
+        Finally
+           frmExcluidos3.Free;
+        End;

@@ -1,0 +1,70 @@
+object frmSplash: TfrmSplash
+  Left = 211
+  Top = 148
+  BorderStyle = bsNone
+  Caption = 'frmSplash'
+  ClientHeight = 255
+  ClientWidth = 372
+  Color = clWhite
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poScreenCenter
+  OnClose = FormClose
+  OnPaint = FormPaint
+  OnResize = FormResize
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Image1: TImage
+    Left = 0
+    Top = 0
+    Width = 372
+    Height = 192
+    Align = alClient
+    Stretch = True
+  end
+  object lblNet: TLabel
+    Left = 221
+    Top = 4
+    Width = 137
+    Height = 23
+    Caption = 'InfoEtiquetas '#169
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clNavy
+    Font.Height = -16
+    Font.Name = 'Arial Black'
+    Font.Style = []
+    ParentFont = False
+    Transparent = True
+  end
+  object Panel1: TPanel
+    Left = 0
+    Top = 192
+    Width = 372
+    Height = 63
+    Align = alBottom
+    Color = clBlue
+    TabOrder = 0
+    object Label1: TLabel
+      Left = 21
+      Top = 15
+      Width = 315
+      Height = 26
+      Alignment = taCenter
+      Caption = 
+        'InfoG2 '#174'  - Tecnologia em Sistemas.  '#13#10'Copyrigth '#169' 2005 - 2014 T' +
+        'odos os direitos reservados. '
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWhite
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      ParentFont = False
+      Transparent = True
+      WordWrap = True
+    end
+  end
+end

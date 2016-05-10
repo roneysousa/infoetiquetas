@@ -1,0 +1,122 @@
+unit uFrmAddProduto;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, ExtCtrls, StdCtrls, Buttons, Mask, ToolEdit, CurrEdit;
+
+type
+  TfrmAddProduto = class(TForm)
+    Panel1: TPanel;
+    Panel2: TPanel;
+    btnConfirma: TBitBtn;
+    btnCancelar: TBitBtn;
+    Label1: TLabel;
+    edtCDPROD: TEdit;
+    edtQUANT: TCurrencyEdit;
+    Label2: TLabel;
+    edtNMPROD: TEdit;
+    edtValor: TCurrencyEdit;
+    spLocalizar: TSpeedButton;
+    procedure btnCancelarClick(Sender: TObject);
+    procedure btnConfirmaClick(Sender: TObject);
+    procedure edtCDPRODExit(Sender: TObject);
+    procedure edtCDPRODKeyPress(Sender: TObject; var Key: Char);
+    procedure edtQUANTKeyPress(Sender: TObject; var Key: Char);
+    procedure edtCDPRODChange(Sender: TObject);
+    procedure spLocalizarClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmAddProduto: TfrmAddProduto;
+
+implementation
+
+uses uFuncoes, udmEtiquetas, uLocProduto;
+
+{$R *.dfm}
+
+procedure TfrmAddProduto.btnCancelarClick(Sender: TObject);
+begin
+     Close;
+end;
+
+procedure TfrmAddProduto.btnConfirmaClick(Sender: TObject);
+begin
+     If not uFuncoes.Empty(edtCDPROD.Text) Then
+      begin
+         dmEtiquetas.Adicionar_Dados(edtCDPROD.Text, StrtoInt(edtQUANT.text), edtValor.Value);
+         Close;
+      End;   
+end;
+
+procedure TfrmAddProduto.edtCDPRODExit(Sender: TObject);
+begin
+      If not Empty(edtCDPROD.Text) Then
+        if (dmEtiquetas.GetProduto(uFuncoes.StrZero(edtCDPROD.Text,13))) Then
+          begin
+               edtCDPROD.Text := uFuncoes.StrZero(edtCDPROD.Text,13); 
+               edtNMPROD.Text := dmEtiquetas.QryAux2.FieldByName('PRO_NMPROD').AsString;
+               edtValor.Value := dmEtiquetas.QryAux2.FieldByName('PRO_VLVEND').AsFloat;
+          End
+          Else
+          Begin
+               edtCDPROD.SetFocus;
+               raise Exception.Create('Código não cadastrado.');
+          End;
+end;
+
+procedure TfrmAddProduto.edtCDPRODKeyPress(Sender: TObject; var Key: Char);
+begin
+    If not( key in['0'..'9',#8, #13] ) then
+        key:=#0;
+    //
+    If (key = #13) and not Empty(edtCDPROD.Text) Then
+      begin
+           key:=#0;
+           edtQUANT.SetFocus;
+      End;
+end;
+
+procedure TfrmAddProduto.edtQUANTKeyPress(Sender: TObject; var Key: Char);
+begin
+    If (key = #13) and (edtQUANT.value >= 1) Then
+      begin
+           key:=#0;
+           btnConfirma.SetFocus;
+      End;
+end;
+
+procedure TfrmAddProduto.edtCDPRODChange(Sender: TObject);
+begin
+     if Empty(edtCDPROD.Text) Then
+      begin
+           edtNMPROD.Clear;
+           edtValor.Clear;    
+      End;
+end;
+
+procedure TfrmAddProduto.spLocalizarClick(Sender: TObject);
+begin
+     Application.CreateForm(TfrmLocProduto, frmLocProduto);
+     Try
+        frmLocProduto.ShowModal;
+     Finally
+         If (frmLocProduto.qryProduto.recordCount > 0) Then
+            edtCDPROD.Text := frmLocProduto.qryProduto.fieldByName('PRO_CDPROD').AsString;
+         //
+         frmLocProduto.Free;
+         //
+         if length(edtCDPROD.Text) <> 0 then
+            edtQUANT.SetFocus
+         else
+            edtCDPROD.SetFocus;
+     End;
+end;
+
+end.
